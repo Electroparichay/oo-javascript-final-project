@@ -1,19 +1,41 @@
+/* global WATER_ROWS */
+/* global max */
+/* global canvas */
+/* global TILE_SIZE */
 /* global GRASS_ROWS */
 /* global NUM_ROWS */
 /* global NUM_COLS */
 /* global Resources */
 /* global ctx */
 
-//Represents the xy coordinates of the character on the screen.
+//Represents the xy coordinates.
 var Position = function(x, y) {
     this.x = x;
     this.y = y;
 };
 
+var PositionFunctions = {
+    getTilePosition : function (row, column) {
+        var canvasRectangle = canvas.getBoundingClientRect();
+        var canvasTopLeft = new Position(canvasRectangle.left, canvasRectangle.top);
+        var x = canvasTopLeft.x + row * TILE_SIZE.width;
+        var y = canvasTopLeft.y + column * TILE_SIZE.height;
+
+        return Position(x, y);
+    },
+    /*Returns the position of the player on the tile*/
+    getPlayerPosition : function(row, column) {
+        var tileTopLeft = PositionFunctions.getTilePosition(row, column);
+        var x = parseInt((tileTopLeft.x + TILE_SIZE.width) / 2);
+        var y = parseFloat((tileTopLeft.y + TILE_SIZE.width) / 2);
+        return new Position(x, y);
+    }
+};
+
 // Generic character
 var Character = function (position, spritePath) {
-    this.x = position.x;
-    this.y = position.y;
+    this.x = position ? position.x : undefined;
+    this.y = position ? position.y : undefined;
     this.sprite = spritePath;
 };
 
@@ -26,6 +48,7 @@ Character.prototype.render = function() {
 var Enemy = function(position, spritePath) {
     Character.call(this, position, spritePath);
 };
+
 Enemy.prototype = Object.create(Character.prototype);
 Enemy.prototype.consturctor = Enemy;
 
@@ -38,51 +61,52 @@ Enemy.prototype.update = function(dt) {
 };
 
 
-var Player = function(position, spritePath) {
-    Character.call(this, position, spritePath);
+var Player = function(row, column, spritePath) {
+    Character.call(this, null, spritePath);
+    this.row = row;
+    this.column = column;
 };
 
 Player.prototype = Object.create(Character.prototype);
 Player.prototype.constructor = Player;
 
-Player.prototype.initialPosition = function() {
-    var rowNumber = GRASS_ROWS[GRASS_ROWS.length - 1];
-    var columnNumber = parseInt(NUM_COLS / 2);
-    return new Position(columnNumber, rowNumber);
-};
-
 Player.prototype.update = function(dt) {
     throw new Error('Not yet implemented');
 };
 
-
 Player.prototype.BOUNDARIES = {
     left : 0,
     right : NUM_COLS - 1,
-    up : 0,
+    up : max(WATER_ROWS), //First water row.
     down : NUM_ROWS - 1
 };
 
 //Resets player to original position.
 Player.prototype.reset = function() {
-    var position = this.initialPosition();
-    this.x = position.x;
-    this.y = position.y;  
+    var rowNumber = GRASS_ROWS[GRASS_ROWS.length - 1];
+    var columnNumber = parseInt(NUM_COLS / 2);
+    this.row = rowNumber;
+    this.column = columnNumber;
 };
 
 Player.prototype.handleInput = function(key) {
     switch(key){
         case 'left':
-            if(this.x > this.BOUNDARIES.left) this.x--;
+            if(this.row > this.BOUNDARIES.left) this.row--;
             break;
         case 'up':
-            if(this.y > this.BOUNDARIES.up) this.y--;
+            if(this.column > this.BOUNDARIES.up) {
+                this.column--;
+            } else {
+                //Player hit the water
+                this.reset();
+            }
             break;
         case 'right':
-            if(this.x > this.BOUNDARIES.left) this.x--;
+            if(this.row < this.BOUNDARIES.left) this.row++;
             break;
         case 'down':
-            if(this.y < this.BOUNDARIES.down) this.y++;
+            if(this.column < this.BOUNDARIES.down) this.column++;
             break;
         default: 
             throw new ErrorEvent('Invalid input key.');
@@ -105,6 +129,5 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-
     player.handleInput(allowedKeys[e.keyCode]);
 });
