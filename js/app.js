@@ -1,11 +1,19 @@
+/* global GRASS_ROWS */
+/* global NUM_ROWS */
+/* global NUM_COLS */
 /* global Resources */
 /* global ctx */
 
+//Represents the xy coordinates of the character on the screen.
+var Position = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
 
 // Generic character
-var Character = function (xCoordiante, yCoordinate, spritePath) {
-    this.x = xCoordiante;
-    this.y = yCoordinate;
+var Character = function (position, spritePath) {
+    this.x = position.x;
+    this.y = position.y;
     this.sprite = spritePath;
 };
 
@@ -15,8 +23,8 @@ Character.prototype.render = function() {
 };
 
 // Enemies our player must avoid
-var Enemy = function(xCoordiante, yCoordinate, spritePath) {
-    Character.call(this, xCoordiante, yCoordinate, spritePath);
+var Enemy = function(position, spritePath) {
+    Character.call(this, position, spritePath);
 };
 Enemy.prototype = Object.create(Character.prototype);
 Enemy.prototype.consturctor = Enemy;
@@ -29,38 +37,52 @@ Enemy.prototype.update = function(dt) {
     // all computers.
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-var Player = function(xCoordiante, yCoordinate, spritePath) {
-    Character.call(this, xCoordiante, yCoordinate, spritePath);
+
+var Player = function(position, spritePath) {
+    Character.call(this, position, spritePath);
 };
+
 Player.prototype = Object.create(Character.prototype);
-Player.prototype.consturctor = Player;
+Player.prototype.constructor = Player;
+
+Player.prototype.initialPosition = function() {
+    var rowNumber = GRASS_ROWS[GRASS_ROWS.length - 1];
+    var columnNumber = parseInt(NUM_COLS / 2);
+    return new Position(columnNumber, rowNumber);
+};
 
 Player.prototype.update = function(dt) {
     throw new Error('Not yet implemented');
 };
 
+
+Player.prototype.BOUNDARIES = {
+    left : 0,
+    right : NUM_COLS - 1,
+    up : 0,
+    down : NUM_ROWS - 1
+};
+
 //Resets player to original position.
 Player.prototype.reset = function() {
-    throw new Error('Not yet implemented');    
+    var position = this.initialPosition();
+    this.x = position.x;
+    this.y = position.y;  
 };
 
 Player.prototype.handleInput = function(key) {
-    throw new Error('Not yet implemented');
     switch(key){
         case 'left':
-            //Move left, if possible
+            if(this.x > this.BOUNDARIES.left) this.x--;
             break;
         case 'up':
-            //Move up, if possible
+            if(this.y > this.BOUNDARIES.up) this.y--;
             break;
         case 'right':
-            //Move right, if possible
+            if(this.x > this.BOUNDARIES.left) this.x--;
             break;
         case 'down':
-            //Move down, if possible
+            if(this.y < this.BOUNDARIES.down) this.y++;
             break;
         default: 
             throw new ErrorEvent('Invalid input key.');
