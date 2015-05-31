@@ -36,21 +36,10 @@
      */
     function _load(url) {
         if(resourceCache[url]) {
-            /* If this URL has been previously loaded it will exist within
-             * our resourceCache array. Just return that image rather
-             * re-loading the image.
-             */
             return resourceCache[url];
         } else {
-            /* This URL has not been previously loaded and is not present
-             * within our cache; we'll need to load this image.
-             */
             var img = new Image();
-            img.onload = function() {
-                /* Once our image has properly loaded, add it to our cache
-                 * so that we can simply return this image if the developer
-                 * attempts to load this file in the future.
-                 */
+            img.onload = function() { 
                 resourceCache[url] = img;
 
                 /* Once the image is actually loaded and properly cached,
@@ -70,10 +59,6 @@
         }
     }
 
-    /* This is used by developer's to grab references to images they know
-     * have been previously loaded. If an image is cached, this functions
-     * the same as calling load() on that URL.
-     */
     function get(url) {
         return resourceCache[url];
     }
