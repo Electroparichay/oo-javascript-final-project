@@ -1,3 +1,7 @@
+/* global Resources */
+/* global ctx */
+
+
 // Generic character
 var Character = function (xCoordiante, yCoordinate, spritePath) {
     this.x = xCoordiante;
@@ -28,6 +32,40 @@ Enemy.prototype.update = function(dt) {
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
+var Player = function(xCoordiante, yCoordinate, spritePath) {
+    Character.call(this, xCoordiante, yCoordinate, spritePath);
+};
+Player.prototype = Object.create(Character.prototype);
+Player.prototype.consturctor = Player;
+
+Player.prototype.update = function(dt) {
+    throw new Error('Not yet implemented');
+};
+
+//Resets player to original position.
+Player.prototype.reset = function() {
+    throw new Error('Not yet implemented');    
+};
+
+Player.prototype.handleInput = function(key) {
+    throw new Error('Not yet implemented');
+    switch(key){
+        case 'left':
+            //Move left, if possible
+            break;
+        case 'up':
+            //Move up, if possible
+            break;
+        case 'right':
+            //Move right, if possible
+            break;
+        case 'down':
+            //Move down, if possible
+            break;
+        default: 
+            throw new ErrorEvent('Invalid input key.');
+    }
+};
 
 
 // Now instantiate your objects.
