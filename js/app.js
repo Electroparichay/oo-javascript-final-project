@@ -8,6 +8,13 @@
 /* global Resources */
 /* global ctx */
 
+var BOUNDARIES = {
+    left : 0,
+    right : NUM_COLS - 1,
+    up : max(WATER_ROWS), //First water row.
+    down : NUM_ROWS - 1
+};
+
 //Represents the xy coordinates.
 var Position = function(x, y) {
     this.x = x;
@@ -23,8 +30,8 @@ var PositionFunctions = {
 
         return Position(x, y);
     },
-    /*Returns the position of the player on the tile*/
-    getPlayerPosition : function(row, column) {
+    /*Returns the position of the character on the tile*/
+    getCharacterPosition : function(row, column) {
         var tileTopLeft = PositionFunctions.getTilePosition(row, column);
         var x = parseInt((tileTopLeft.x + TILE_SIZE.width) / 2);
         var y = parseFloat((tileTopLeft.y + TILE_SIZE.width) / 2);
@@ -36,10 +43,11 @@ var PositionFunctions = {
 var Character = function (position, spritePath) {
     this.x = position ? position.x : undefined;
     this.y = position ? position.y : undefined;
+    this.isOnScreen = true;
     this.sprite = spritePath;
 };
 
-// Draw the enemy on the screen, required method for game
+// Draw the character on the screen
 Character.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
@@ -58,27 +66,28 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+    
+};
+
+//Returns true if enemy is within the canvas boundaries
+Enemy.prototype.isOnScreen = function() {
+    return this.x >= BOUNDARIES.left && this.x <= BOUNDARIES.right &&
+        this.y <= BOUNDARIES.down && this.y >= BOUNDARIES.up;
 };
 
 
-var Player = function(row, column, spritePath) {
+var Player = function(spritePath) {
     Character.call(this, null, spritePath);
-    this.row = row;
-    this.column = column;
+    this.reset();
 };
 
 Player.prototype = Object.create(Character.prototype);
 Player.prototype.constructor = Player;
 
-Player.prototype.update = function(dt) {
-    throw new Error('Not yet implemented');
-};
-
-Player.prototype.BOUNDARIES = {
-    left : 0,
-    right : NUM_COLS - 1,
-    up : max(WATER_ROWS), //First water row.
-    down : NUM_ROWS - 1
+Player.prototype.update = function() {
+    var currentPosition = PositionFunctions.getCharacterPosition(this.row, this.column);
+    this.x = currentPosition.x;
+    this.y = currentPosition.y;
 };
 
 //Resets player to original position.
@@ -92,10 +101,10 @@ Player.prototype.reset = function() {
 Player.prototype.handleInput = function(key) {
     switch(key){
         case 'left':
-            if(this.row > this.BOUNDARIES.left) this.row--;
+            if(this.row > BOUNDARIES.left) this.row--;
             break;
         case 'up':
-            if(this.column > this.BOUNDARIES.up) {
+            if(this.column > BOUNDARIES.up) {
                 this.column--;
             } else {
                 //Player hit the water
@@ -103,10 +112,10 @@ Player.prototype.handleInput = function(key) {
             }
             break;
         case 'right':
-            if(this.row < this.BOUNDARIES.left) this.row++;
+            if(this.row < BOUNDARIES.left) this.row++;
             break;
         case 'down':
-            if(this.column < this.BOUNDARIES.down) this.column++;
+            if(this.column < BOUNDARIES.down) this.column++;
             break;
         default: 
             throw new ErrorEvent('Invalid input key.');
@@ -117,7 +126,6 @@ Player.prototype.handleInput = function(key) {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-
 
 
 // This listens for key presses and sends the keys to your
