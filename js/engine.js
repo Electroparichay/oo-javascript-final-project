@@ -117,7 +117,15 @@ var Engine = (function(global) {
             ],
             numRows = 6,
             numCols = 5,
+            imageSize = { height: 83, width: 101},
             row, col;
+        global.TILE_SIZE = imageSize;
+        global.NUM_ROWS = numRows;
+        global.NUM_COLS = numCols;
+        global.WATER_ROWS = [0];
+        global.STONE_ROWS = [1, 2, 3];
+        global.GRASS_ROWS = [4, 5];
+        
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -132,11 +140,9 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+                ctx.drawImage(Resources.get(rowImages[row]), col * imageSize.width, row * imageSize.height);
             }
         }
-
-
         renderEntities();
     }
 
