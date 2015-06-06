@@ -11,7 +11,7 @@ var Enemy = function(spritePath) {
 	    var topRow = max(GRASS_ROWS);
 	    var bottomRow = min(GRASS_ROWS);
 	    var randomRow = randomInt(topRow, bottomRow);
-		var randomY = PositionFunctions.getCharacterPosition(randomRow, 0;).y;
+		var randomY = PositionFunctions.getCharacterPosition(randomRow, 0).y;
 
 		return new Position(randomX, randomY);
 	}
