@@ -14,20 +14,23 @@
  * a little simpler to work with.
  */
 
-var Engine = (function(global) {
+var Engine = function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
-    var doc = global.document,
-        win = global.window,
-        canvas = doc.createElement('canvas'),
-        ctx = canvas.getContext('2d'),
-        lastTime;
+    var canvas = global.document.createElement('canvas');
+    this.ctx = canvas.getContext('2d');
+    this.characters = {};
+    var lastTime;
 
     canvas.width = 505;
     canvas.height = 606;
-    doc.body.appendChild(canvas);
+    global.document.body.appendChild(canvas);
+
+    this.start = function() {
+        init();
+    };
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -56,7 +59,7 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        global.window.requestAnimationFrame(main);
     };
 
     /* This function does some initial setup that should only occur once,
@@ -69,6 +72,32 @@ var Engine = (function(global) {
         main();
     }
 
+    function enemyCollidedWithPlayer(enemy) {
+        function rectanglesIntersect(rect1, rect2) {
+            //This method detects if {rect2} is within {rect1}. TODO: Rewrite to account for the case
+            //when {rect1} is within {rect2}.
+            var rect1TopLeft = new Position(rect1.left, rect1.top);
+            var rect1BottomRight = new Position(rect1.right, rect1.bottom);
+            var rect2TopLeft = new Position(rect1.left, rect1.top);
+            var rect2BottomRight = new Position(rect1.right, rect1.bottom);
+            
+            var shareYRange = (rect1TopLeft.y <= rect2TopLeft.y && rect1BottomRight.y >= rect2TopLeft.y) ||
+                (rect1TopLeft.y <= rect2BottomRight.y && rect1BottomRight.y >= rect2BottomRight.y);
+            var shareXRange = (rect1TopLeft.x <= rect2TopLeft.x && rect1BottomRight.x >= rect2TopLeft.x) ||
+                (rect1TopLeft.x <= rect2BottomRight.x && rect1BottomRight.x >= rect2BottomRight.x) ||
+                (rect1TopLeft.x > rect2BottomRight.x && rect1BottomRight.x < rect2BottomRight.x);
+
+            return shareYRange && shareXRange;
+        }
+
+        var enemyRectangle = enemy.getBoundingClientRect();
+        var playerRectangle = this.getPlayer().sprite.getBoundingClientRect();
+        var playerAndEnemyIntersected = rectanglesIntersect(playerRectangle, enemyRectangle) ||
+            rectanglesIntersect(enemyRectangle, playerRectangle);
+
+        return playerAndEnemyIntersected;
+    };
+
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. Based on how
      * you implement your collision detection (when two entities occupy the
@@ -80,7 +109,6 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
     }
 
     /* This is called by the update function  and loops through all of the
@@ -91,10 +119,15 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
-            enemy.update(dt);
-        });
+        var player = this.getPlayer();
+        var enemies = this.getEnemies();
         player.update();
+        enemies.forEach(function(enemy) {
+            enemy.update(dt);
+            if (enemyCollidedWithPlayer(enemy)) {
+                player.reset();
+            }
+        });
     }
 
     /* This function initially draws the "game level", it will then call
@@ -108,39 +141,22 @@ var Engine = (function(global) {
          * for that particular row of the game level.
          */
         var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
-            ],
-            numRows = 6,
-            numCols = 5,
-            imageSize = { height: 83, width: 101},
-            row, col;
-        global.TILE_SIZE = imageSize;
-        global.NUM_ROWS = numRows;
-        global.NUM_COLS = numCols;
-        global.WATER_ROWS = [0];
-        global.STONE_ROWS = [1, 2, 3];
-        global.GRASS_ROWS = [4, 5];
-        
+            'images/water-block.png',   // Top row is water
+            'images/stone-block.png',   // Row 1 of 3 of stone
+            'images/stone-block.png',   // Row 2 of 3 of stone
+            'images/stone-block.png',   // Row 3 of 3 of stone
+            'images/grass-block.png',   // Row 1 of 2 of grass
+            'images/grass-block.png'    // Row 2 of 2 of grass
+        ];
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
-                /* The drawImage function of the canvas' context element
-                 * requires 3 parameters: the image to draw, the x coordinate
-                 * to start drawing and the y coordinate to start drawing.
-                 * We're using our Resources helpers to refer to our images
-                 * so that we get the benefits of caching these images, since
-                 * we're using them over and over.
-                 */
-                ctx.drawImage(Resources.get(rowImages[row]), col * imageSize.width, row * imageSize.height);
+        for (var row = 0; row < Engine.NUM_ROWS; row++) {
+            for (var col = 0; col < Engine.NUM_COLS; col++) {
+                this.ctx.drawImage(Resources.get(rowImages[row]), col * Engine.TILE_SIZE.width, 
+                    row * Engine.TILE_SIZE.height);
             }
         }
         renderEntities();
@@ -154,11 +170,11 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
+        this.getEnemies().forEach(function(enemy) {
             enemy.render();
         });
 
-        player.render();
+        this.getPlayer().render();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -166,7 +182,7 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        throw new Error('Not implemented');
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -181,10 +197,27 @@ var Engine = (function(global) {
         'images/char-boy.png'
     ]);
     Resources.onReady(init);
+};
 
-    /* Assign the canvas' context object to the global variable (the window
-     * object when run in a browser) so that developer's can use it more easily
-     * from within their app.js files.
-     */
-    global.ctx = ctx;
-})(this);
+Engine.prototype.setPlayer = function(player) {
+    this.characters.player = player;
+};
+
+Engine.prototype.setEnemies = function(enemiesArray) {
+    this.characters.enemies = enemiesArray;
+};
+
+Engine.prototype.getPlayer = function() {
+    return this.characters.player;
+};
+
+Engine.prototype.getEnemies = function() {
+    return this.characters.enemies;
+};
+
+Engine.TILE_SIZE = { height: 83, width: 101};
+Engine.NUM_ROWS = 6;
+Engine.NUM_COLS = 5;
+Engine.WATER_ROWS = [0];
+Engine.STONE_ROWS = [1, 2, 3];
+Engine.GRASS_ROWS = [4, 5];

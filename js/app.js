@@ -2,11 +2,14 @@
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
+var engine = new Engine(this);
+engine.start();
+
 var player = new Player('images/char-boy.png');
 
 const MIN_ENEMIES = 5;
 const MAX_ENEMIES = 10;
-var numberOfEnemies = MIN_ENEMIES + (parseInt(Math.random()) % MAX_ENEMIES);
+var numberOfEnemies = randomInt(MIN_ENEMIES, MAX_ENEMIES);
 
 var allEnemies = new Array(numberOfEnemies);
 allEnemies.forEach(function(value, index) {
@@ -24,3 +27,6 @@ document.addEventListener('keyup', function(e) {
     };
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+engine.setPlayer(player);
+engine.setEnemies(allEnemies);
