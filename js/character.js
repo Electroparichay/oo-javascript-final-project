@@ -8,5 +8,5 @@ var Character = function (position, spritePath) {
 
 // Draw the character on the screen
 Character.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    engine.ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };

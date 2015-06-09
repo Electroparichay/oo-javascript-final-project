@@ -10,6 +10,6 @@ var min = function(numberArray) {
 
 /* Returns a random number between {from} and {to}, inclusive.*/
 var randomInt = function(from, to) {
-	randomNumber = ( Math.random()* (max-min+1) ) + min;
+	randomNumber = ( Math.random() * (to - from + 1) ) + from;
 	return parseInt(randomNumber);
 };

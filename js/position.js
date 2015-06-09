@@ -18,7 +18,7 @@ var PositionFunctions = {
         var x = canvasTopLeft.x + row * Engine.TILE_SIZE.width;
         var y = canvasTopLeft.y + column * Engine.TILE_SIZE.height;
 
-        return Position(x, y);
+        return new Position(x, y);
     },
     /*Returns the position of the character on the tile*/
     getCharacterPosition : function(row, column) {

@@ -31,7 +31,7 @@ var Engine = function(global) {
     global.document.body.appendChild(this.canvas);
 
     this.start = function() {
-        init();
+        Resources.onReady(init);
     };
 
     /* This function serves as the kickoff point for the game loop itself
@@ -92,8 +92,8 @@ var Engine = function(global) {
             return shareYRange && shareXRange;
         }
 
-        var enemyRectangle = enemy.getBoundingClientRect();
-        var playerRectangle = self.getPlayer().sprite.getBoundingClientRect();
+        var enemyRectangle = Engine.getCharacterImage(enemy).getBoundingClientRect();
+        var playerRectangle = Engine.getCharacterImage(self.getPlayer()).getBoundingClientRect();
         var playerAndEnemyIntersected = rectanglesIntersect(playerRectangle, enemyRectangle) ||
             rectanglesIntersect(enemyRectangle, playerRectangle);
 
@@ -157,7 +157,8 @@ var Engine = function(global) {
          */
         for (var row = 0; row < Engine.NUM_ROWS; row++) {
             for (var col = 0; col < Engine.NUM_COLS; col++) {
-                self.ctx.drawImage(Resources.get(rowImages[row]), col * Engine.TILE_SIZE.width, 
+                var rowImage = Resources.get(rowImages[row]);
+                self.ctx.drawImage(rowImage, col * Engine.TILE_SIZE.width, 
                     row * Engine.TILE_SIZE.height);
             }
         }
@@ -198,15 +199,19 @@ var Engine = function(global) {
         'images/enemy-bug.png',
         'images/char-boy.png'
     ]);
-    Resources.onReady(init);
 };
 
 Engine.prototype.setPlayer = function(player) {
     this.characters.player = player;
+    Resources.load([this.characters.player.sprite]);
 };
 
 Engine.prototype.setEnemies = function(enemiesArray) {
     this.characters.enemies = enemiesArray;
+    var enemiesSprites= enemiesArray.map(function (enemy) {
+        return enemy.sprite;
+    });
+    Resources.load(enemiesSprites);
 };
 
 Engine.prototype.getPlayer = function() {
@@ -216,6 +221,10 @@ Engine.prototype.getPlayer = function() {
 Engine.prototype.getEnemies = function() {
     return this.characters.enemies;
 };
+
+Engine.getCharacterImage = function(character) {
+    return Resources.get(character.sprite);
+}
 
 Engine.TILE_SIZE = { height: 83, width: 101}; //TODO: Read the values from a tile image instead of 
 Engine.NUM_ROWS = 6;

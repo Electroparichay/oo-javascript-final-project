@@ -11,9 +11,9 @@ const MAX_ENEMIES = 10;
 var numberOfEnemies = randomInt(MIN_ENEMIES, MAX_ENEMIES);
 
 var allEnemies = new Array(numberOfEnemies);
-allEnemies.forEach(function(value, index) {
-   allEnemies[index] = new Enemy('enemy-bug.png'); 
-});
+for (var i = 0; i < numberOfEnemies; i++) {
+	allEnemies[i] = new Enemy('images/enemy-bug.png'); 
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
