@@ -3,7 +3,6 @@
 // Place the player object in a variable called player
 
 var engine = new Engine(this);
-engine.start();
 
 var player = new Player('images/char-boy.png');
 
@@ -30,3 +29,4 @@ document.addEventListener('keyup', function(e) {
 
 engine.setPlayer(player);
 engine.setEnemies(allEnemies);
+engine.start();

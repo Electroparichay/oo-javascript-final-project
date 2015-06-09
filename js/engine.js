@@ -19,14 +19,16 @@ var Engine = function(global) {
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
-    var canvas = global.document.createElement('canvas');
-    this.ctx = canvas.getContext('2d');
+    this.canvas = global.document.createElement('canvas'); //Refactor code to provide
+        //Functions to read values from the canvas instead of making it public.
+    var self = this;
+    this.ctx = this.canvas.getContext('2d');
     this.characters = {};
     var lastTime;
 
-    canvas.width = 505;
-    canvas.height = 606;
-    global.document.body.appendChild(canvas);
+    this.canvas.width = 505;
+    this.canvas.height = 606;
+    global.document.body.appendChild(this.canvas);
 
     this.start = function() {
         init();
@@ -67,7 +69,7 @@ var Engine = function(global) {
      * game loop.
      */
     function init() {
-        reset();
+        //reset();
         lastTime = Date.now();
         main();
     }
@@ -91,7 +93,7 @@ var Engine = function(global) {
         }
 
         var enemyRectangle = enemy.getBoundingClientRect();
-        var playerRectangle = this.getPlayer().sprite.getBoundingClientRect();
+        var playerRectangle = self.getPlayer().sprite.getBoundingClientRect();
         var playerAndEnemyIntersected = rectanglesIntersect(playerRectangle, enemyRectangle) ||
             rectanglesIntersect(enemyRectangle, playerRectangle);
 
@@ -119,8 +121,8 @@ var Engine = function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        var player = this.getPlayer();
-        var enemies = this.getEnemies();
+        var player = self.getPlayer();
+        var enemies = self.getEnemies();
         player.update();
         enemies.forEach(function(enemy) {
             enemy.update(dt);
@@ -155,7 +157,7 @@ var Engine = function(global) {
          */
         for (var row = 0; row < Engine.NUM_ROWS; row++) {
             for (var col = 0; col < Engine.NUM_COLS; col++) {
-                this.ctx.drawImage(Resources.get(rowImages[row]), col * Engine.TILE_SIZE.width, 
+                self.ctx.drawImage(Resources.get(rowImages[row]), col * Engine.TILE_SIZE.width, 
                     row * Engine.TILE_SIZE.height);
             }
         }
@@ -170,11 +172,11 @@ var Engine = function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        this.getEnemies().forEach(function(enemy) {
+        self.getEnemies().forEach(function(enemy) {
             enemy.render();
         });
 
-        this.getPlayer().render();
+        self.getPlayer().render();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -215,7 +217,7 @@ Engine.prototype.getEnemies = function() {
     return this.characters.enemies;
 };
 
-Engine.TILE_SIZE = { height: 83, width: 101};
+Engine.TILE_SIZE = { height: 83, width: 101}; //TODO: Read the values from a tile image instead of 
 Engine.NUM_ROWS = 6;
 Engine.NUM_COLS = 5;
 Engine.WATER_ROWS = [0];

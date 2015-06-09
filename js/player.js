@@ -14,8 +14,8 @@ Player.prototype.update = function() {
 
 //Resets player to original position.
 Player.prototype.reset = function() {
-    var rowNumber = GRASS_ROWS[GRASS_ROWS.length - 1];
-    var columnNumber = parseInt(NUM_COLS / 2);
+    var rowNumber = Engine.GRASS_ROWS[Engine.GRASS_ROWS.length - 1];
+    var columnNumber = parseInt(Engine.NUM_COLS / 2);
     this.row = rowNumber;
     this.column = columnNumber;
 };
