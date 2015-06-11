@@ -19,6 +19,7 @@ var Engine = function(global) {
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
+    var tilesAlreadyDrawn = false;
     this.canvas = global.document.createElement('canvas'); //Refactor code to provide
         //Functions to read values from the canvas instead of making it public.
     var self = this;
@@ -26,8 +27,8 @@ var Engine = function(global) {
     this.characters = {};
     var lastTime;
 
-    this.canvas.width = 505;
-    this.canvas.height = 606;
+    this.canvas.width = Engine.TILE_SIZE.width * Engine.NUM_COLS;
+    this.canvas.height = Engine.ACTUAL_TILE_SIZE.height * Engine.NUM_ROWS;
     global.document.body.appendChild(this.canvas);
 
     this.start = function() {
@@ -92,8 +93,8 @@ var Engine = function(global) {
             return shareYRange && shareXRange;
         }
 
-        var enemyRectangle = Engine.getCharacterImage(enemy).getBoundingClientRect();
-        var playerRectangle = Engine.getCharacterImage(self.getPlayer()).getBoundingClientRect();
+        var enemyRectangle = enemy.getBoundingClientRect();
+        var playerRectangle = self.getPlayer().getBoundingClientRect();
         var playerAndEnemyIntersected = rectanglesIntersect(playerRectangle, enemyRectangle) ||
             rectanglesIntersect(enemyRectangle, playerRectangle);
 
@@ -126,9 +127,9 @@ var Engine = function(global) {
         player.update();
         enemies.forEach(function(enemy) {
             enemy.update(dt);
-            if (enemyCollidedWithPlayer(enemy)) {
-                player.reset();
-            }
+            // if (enemyCollidedWithPlayer(enemy)) {
+            //     player.reset();
+            // }
         });
     }
 
@@ -139,16 +140,17 @@ var Engine = function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
+        if (tilesAlreadyDrawn) return;
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
         var rowImages = [
-            'images/water-block.png',   // Top row is water
-            'images/stone-block.png',   // Row 1 of 3 of stone
-            'images/stone-block.png',   // Row 2 of 3 of stone
-            'images/stone-block.png',   // Row 3 of 3 of stone
-            'images/grass-block.png',   // Row 1 of 2 of grass
-            'images/grass-block.png'    // Row 2 of 2 of grass
+            'images/water-block.png',   
+            'images/stone-block.png',
+            'images/stone-block.png',
+            'images/stone-block.png',
+            'images/grass-block.png',
+            'images/grass-block.png' 
         ];
 
         /* Loop through the number of rows and columns we've defined above
@@ -224,9 +226,10 @@ Engine.prototype.getEnemies = function() {
 
 Engine.getCharacterImage = function(character) {
     return Resources.get(character.sprite);
-}
+};
 
-Engine.TILE_SIZE = { height: 83, width: 101}; //TODO: Read the values from a tile image instead of 
+Engine.TILE_SIZE = { height: 83, width: 101 }; //TODO: Read the values from a tile image instead of hardcoding them.
+Engine.ACTUAL_TILE_SIZE = { height: 101, width: 171 };
 Engine.NUM_ROWS = 6;
 Engine.NUM_COLS = 5;
 Engine.WATER_ROWS = [0];
