@@ -1,11 +1,11 @@
 
 /* Returns the largest number in {numberArray}*/
 var max = function(numberArray) {
-	Math.max.apply(null, numberArray);
+	return Math.max.apply(null, numberArray);
 };
 
 var min = function(numberArray) {
-	Math.min.apply(null, numberArray);
+	return Math.min.apply(null, numberArray);
 };
 
 /* Returns a random number between {from} and {to}, inclusive.*/

@@ -14,7 +14,7 @@ Player.prototype.update = function() {
 
 //Resets player to original position.
 Player.prototype.reset = function() {
-    var rowNumber = Engine.GRASS_ROWS[Engine.GRASS_ROWS.length - 1];
+    var rowNumber = max(Engine.GRASS_ROWS);
     var columnNumber = parseInt(Engine.NUM_COLS / 2);
     this.row = rowNumber;
     this.column = columnNumber;
@@ -23,21 +23,21 @@ Player.prototype.reset = function() {
 Player.prototype.handleInput = function(key) {
     switch(key){
         case 'left':
-            if(this.row > BOUNDARIES.left) this.row--;
+            if(this.column > BOUNDARIES.left) this.column--;
             break;
         case 'up':
-            if(this.column > BOUNDARIES.up) {
-                this.column--;
+            if(this.row > BOUNDARIES.up) {
+                this.row--;
             } else {
                 //Player hit the water
                 this.reset();
             }
             break;
         case 'right':
-            if(this.row < BOUNDARIES.left) this.row++;
+            if(this.column < BOUNDARIES.right) this.column++;
             break;
         case 'down':
-            if(this.column < BOUNDARIES.down) this.column++;
+            if(this.row < BOUNDARIES.down) this.row++;
             break;
         default: 
             throw new ErrorEvent('Invalid input key.');
