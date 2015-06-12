@@ -76,29 +76,12 @@ var Engine = function(global) {
     }
 
     function enemyCollidedWithPlayer(enemy) {
-        function rectanglesIntersect(rect1, rect2) {
-            //This method detects if {rect2} is within {rect1}. TODO: Rewrite to account for the case
-            //when {rect1} is within {rect2}.
-            var rect1TopLeft = new Position(rect1.left, rect1.top);
-            var rect1BottomRight = new Position(rect1.right, rect1.bottom);
-            var rect2TopLeft = new Position(rect1.left, rect1.top);
-            var rect2BottomRight = new Position(rect1.right, rect1.bottom);
-            
-            var shareYRange = (rect1TopLeft.y <= rect2TopLeft.y && rect1BottomRight.y >= rect2TopLeft.y) ||
-                (rect1TopLeft.y <= rect2BottomRight.y && rect1BottomRight.y >= rect2BottomRight.y);
-            var shareXRange = (rect1TopLeft.x <= rect2TopLeft.x && rect1BottomRight.x >= rect2TopLeft.x) ||
-                (rect1TopLeft.x <= rect2BottomRight.x && rect1BottomRight.x >= rect2BottomRight.x) ||
-                (rect1TopLeft.x > rect2BottomRight.x && rect1BottomRight.x < rect2BottomRight.x);
-
-            return shareYRange && shareXRange;
-        }
-
         var enemyRectangle = enemy.getBoundingClientRect();
         var playerRectangle = self.getPlayer().getBoundingClientRect();
-        var playerAndEnemyIntersected = rectanglesIntersect(playerRectangle, enemyRectangle) ||
-            rectanglesIntersect(enemyRectangle, playerRectangle);
-
-        return playerAndEnemyIntersected;
+        var shareYRange = playerRectangle.top <= enemyRectangle.top && playerRectangle.bottom >= playerRectangle.top;
+        var shareXRange = playerRectangle.left <= enemyRectangle.left && playerRectangle.right >= enemyRectangle.left ||
+            playerRectangle.left <= enemyRectangle.right && playerRectangle.right >= enemyRectangle.right;
+        return shareYRange && shareXRange;
     };
 
     /* This function is called by main (our game loop) and itself calls all
@@ -127,9 +110,9 @@ var Engine = function(global) {
         player.update();
         enemies.forEach(function(enemy) {
             enemy.update(dt);
-            // if (enemyCollidedWithPlayer(enemy)) {
-            //     player.reset();
-            // }
+            if (enemyCollidedWithPlayer(enemy)) {
+                player.reset();
+            }
         });
     }
 

@@ -3,6 +3,7 @@ var Character = function (position, spritePath) {
     this.x = position ? position.x : undefined;
     this.y = position ? position.y : undefined;
     this.sprite = spritePath;
+    this.initialPosition = position;
 };
 
 //Returns true if enemy is within the canvas boundaries
@@ -13,7 +14,15 @@ Character.prototype.isOnScreen = function() {
 };
 
 Character.prototype.getBoundingClientRect = function() {
-	throw new Error('Not yet implemented');
+	var characterImage = Engine.getCharacterImage(this);
+	var halfOfWidth = characterImage.width / 2;
+	var halfOfHeight = characterImage.height / 2;
+	return {
+		top: this.y - halfOfHeight,
+		bottom: this.y + halfOfHeight,
+		left: this.x - halfOfWidth,
+		right: this.x + halfOfWidth
+	}
 };
 
 // Draw the character on the screen
