@@ -1,10 +1,8 @@
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-
 (function(global) {
-    global.engine = new Engine(this);
-    global.player = new Player('images/char-boy.png');    
+    var engine = new Engine(this);
+    var player = new Player('images/char-boy.png');
+    global.player = player;
+    global.engine = engine;
     const MIN_ENEMIES = 5;
     const MAX_ENEMIES = 10;
     var numberOfEnemies = randomInt(MIN_ENEMIES, MAX_ENEMIES);
@@ -23,10 +21,10 @@
             39: 'right',
             40: 'down'
         };
-        global.player.handleInput(allowedKeys[e.keyCode]);
+        player.handleInput(allowedKeys[e.keyCode]);
     });
     
-    global.engine.setPlayer(player);
-    global.engine.setEnemies(allEnemies);
-    global.engine.start();
+    engine.setPlayer(player);
+    engine.setEnemies(allEnemies);
+    engine.start();
 })(this);

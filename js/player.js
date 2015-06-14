@@ -14,10 +14,10 @@ Player.prototype.update = function() {
 
 //Resets player to original position.
 Player.prototype.reset = function() {
-    var rowNumber = max(Engine.GRASS_ROWS);
-    var columnNumber = parseInt(Engine.NUM_COLS / 2);
-    this.row = rowNumber;
-    this.column = columnNumber;
+    var row = max(Engine.GRASS_ROWS);
+    var column = parseInt(Engine.NUM_COLS / 2);
+    this.row = row;
+    this.column = column;
 };
 
 Player.prototype.handleInput = function(key) {

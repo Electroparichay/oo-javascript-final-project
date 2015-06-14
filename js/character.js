@@ -6,13 +6,6 @@ var Character = function (position, spritePath) {
     this.initialPosition = position;
 };
 
-//Returns true if enemy is within the canvas boundaries
-Character.prototype.isOnScreen = function() {
-    var canvasRectangle = engine.canvas.getBoundingClientRect();	
-    return this.x >= canvasRectangle.left && this.x <= canvasRectangle.right &&
-        this.y <= canvasRectangle.bottom && this.y >= canvasRectangle.top;
-};
-
 Character.prototype.getBoundingClientRect = function() {
 	var characterImage = Engine.getCharacterImage(this);
 	var halfOfWidth = characterImage.width / 2;

@@ -30,7 +30,9 @@ var Engine = function(global) {
     this.canvas.width = Engine.TILE_SIZE.width * Engine.NUM_COLS;
     this.canvas.height = Engine.ACTUAL_TILE_SIZE.height * Engine.NUM_ROWS;
     global.document.body.appendChild(this.canvas);
-
+    
+    const CLOSENESS_THRESHOLD = 50;
+    
     this.start = function() {
         Resources.onReady(init);
     };
@@ -80,9 +82,8 @@ var Engine = function(global) {
         var playerRectangle = self.getPlayer().getBoundingClientRect();
         //shareYRange logic is only valid because both rectangles are the same size.
         var shareYRange = playerRectangle.top == enemyRectangle.top && playerRectangle.bottom == enemyRectangle.bottom;
-        var shareXRange = playerRectangle.left <= enemyRectangle.left && playerRectangle.right >= enemyRectangle.left ||
-            playerRectangle.left <= enemyRectangle.right && playerRectangle.right >= enemyRectangle.right;
-        return shareYRange && Math.abs(player.x - enemy.x) < 10;
+        var shareXrange = Math.abs(self.getPlayer().x - enemy.x) < CLOSENESS_THRESHOLD;
+        return shareYRange && shareXrange;
     };
 
     /* This function is called by main (our game loop) and itself calls all
