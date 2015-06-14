@@ -31,8 +31,6 @@ var Engine = function(global) {
     this.canvas.height = Engine.ACTUAL_TILE_SIZE.height * Engine.NUM_ROWS;
     global.document.body.appendChild(this.canvas);
     
-    const CLOSENESS_THRESHOLD = 50;
-    
     this.start = function() {
         Resources.onReady(init);
     };
@@ -78,11 +76,18 @@ var Engine = function(global) {
     }
 
     function enemyCollidedWithPlayer(enemy) {
+        // Here we assume both character images are the same size.       
         var enemyRectangle = enemy.getBoundingClientRect();
         var playerRectangle = self.getPlayer().getBoundingClientRect();
-        //shareYRange logic is only valid because both rectangles are the same size.
+        var rectangleWidth = enemyRectangle.right - enemyRectangle.left;
+        // shareYRange logic is only valid because both rectangles are the same size.
         var shareYRange = playerRectangle.top == enemyRectangle.top && playerRectangle.bottom == enemyRectangle.bottom;
-        var shareXrange = Math.abs(self.getPlayer().x - enemy.x) < CLOSENESS_THRESHOLD;
+        var distanceBetweenCenters = Math.abs(self.getPlayer().x - enemy.x);
+        // This makes the collision to only be detected after some significant contact.
+        // This is an improvement over comparing exact coordinates because it makes the 
+        // game seem more fluid. Otherwise the collision would occur as soon as the images
+        // overlap, which seems too sudden to  the user.
+        var shareXrange = distanceBetweenCenters <= rectangleWidth / 3;
         return shareYRange && shareXrange;
     };
 
