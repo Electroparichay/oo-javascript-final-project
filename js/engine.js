@@ -19,7 +19,7 @@ var Engine = function(global) {
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
-    var tilesAlreadyDrawn = false;
+     "using strict";
     this.canvas = global.document.createElement('canvas'); //Refactor code to provide
         //Functions to read values from the canvas instead of making it public.
     var self = this;
@@ -78,10 +78,11 @@ var Engine = function(global) {
     function enemyCollidedWithPlayer(enemy) {
         var enemyRectangle = enemy.getBoundingClientRect();
         var playerRectangle = self.getPlayer().getBoundingClientRect();
-        var shareYRange = playerRectangle.top <= enemyRectangle.top && playerRectangle.bottom >= playerRectangle.top;
+        //shareYRange logic is only valid because both rectangles are the same size.
+        var shareYRange = playerRectangle.top == enemyRectangle.top && playerRectangle.bottom == enemyRectangle.bottom;
         var shareXRange = playerRectangle.left <= enemyRectangle.left && playerRectangle.right >= enemyRectangle.left ||
             playerRectangle.left <= enemyRectangle.right && playerRectangle.right >= enemyRectangle.right;
-        return shareYRange && shareXRange;
+        return shareYRange && Math.abs(player.x - enemy.x) < 10;
     };
 
     /* This function is called by main (our game loop) and itself calls all
@@ -123,7 +124,6 @@ var Engine = function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
-        if (tilesAlreadyDrawn) return;
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
