@@ -1,6 +1,7 @@
-frontend-nanodegree-arcade-game
-===============================
+Final project for Object-Oriented Javascript Course on Udacity.
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+![ScreenShot](docs/screenshot.jpg)
 
-for self-checking their submission.
+Course link: https://www.udacity.com/course/object-oriented-javascript--ud015
+Project instructions: https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc
+
